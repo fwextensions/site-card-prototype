@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+/*
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+*/
+
+/* app theme */
+:root {
+	--card-bg: #11161c;
+	--card-border: #1b2230;
+	--muted: #a7b0bd;
+	--mh: #5b8cff;
+	--respite: #2ec4b6;
+	--sudwm: #a259ff;
+	--sudsub: #ff4d8d;
+}
+
+body {
+	@apply bg-[#0b0e12] text-[#e6e8eb] text-[14px];
+	font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.material-symbols-outlined {
+	font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+/* card primitives */
+.card {
+	@apply bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl flex flex-col overflow-hidden;
+}
+.card-top {
+	@apply flex items-center justify-between gap-3 px-3 pt-3 pb-2 border-b border-[var(--card-border)];
+}
+.card-title {
+	@apply text-[16px] font-semibold leading-snug m-0;
+}
+.card-subtitle {
+	@apply text-[var(--muted)];
+}
+.badge {
+	@apply inline-flex items-center gap-1 px-1.5 py-1 rounded-md border text-xs;
+}
+.category-bar {
+	height: 4px;
+}
+.icon-lane { @apply flex items-center flex-wrap gap-2; }
+.icon {
+	@apply inline-flex items-center justify-center w-7 h-7 rounded-md border border-[var(--card-border)] bg-[#131b25] text-[#e7edf5];
+}
+.icon .material-symbols-outlined { font-size: 20px; }
+.icon.ok { @apply border-green-500; }
+.icon.warn { @apply border-yellow-400; }
+.icon.err { @apply border-red-500; }
+.icon-stack { @apply inline-flex gap-1; }
+
+.chip { @apply inline-flex items-center gap-1.5 px-2 py-1 rounded-full border border-[var(--card-border)] bg-[#1a2330]; }
+
+.kv { @apply flex gap-2 flex-wrap text-[var(--muted)]; }
+.kv strong { @apply text-[#e6e8eb] font-semibold; }
+
+.footer { @apply px-3 pb-3 pt-2 border-t border-[var(--card-border)] flex items-center justify-between; }
+.loc { @apply inline-flex items-center gap-1 text-[var(--muted)]; }
+.actions { @apply inline-flex gap-2; }
+.action-btn { @apply bg-[#151c25] border border-[var(--card-border)] text-[#e6e8eb] px-2 py-1.5 rounded-lg; }
+
+/* layout */
+.app-header { @apply sticky top-0 z-10 flex items-center justify-between gap-3 px-5 py-4 border-b border-[var(--card-border)] bg-[#0d1218]; }
+.cards { @apply grid grid-cols-1 gap-4 px-5 pb-10 max-w-[430px] mx-auto; }
