@@ -19,7 +19,10 @@ const App: React.FC = () => {
 
 	const onLoadDefault = async () => {
 		try {
-			const res = await fetch(`/Street_Team_View.csv?ts=${Date.now()}`, { cache: "no-cache" });
+			const base = typeof window !== "undefined" ? window.location.origin : "";
+			const csvUrl = new URL(`${import.meta.env.BASE_URL}Street_Team_View.csv`, base);
+			csvUrl.searchParams.set("ts", String(Date.now()));
+			const res = await fetch(csvUrl.toString(), { cache: "no-cache" });
 			if (!res.ok) throw new Error("CSV not found under /Street_Team_View.csv. Copy the CSV into client/public.");
 			const text = await res.text();
 			const parsed = await parseCsvText<SiteRow>(text);
