@@ -33,7 +33,7 @@ export const extractPhone = (text?: string): string => {
 export const iconNameForAdmission = (val?: string): string => {
 	if (!val) return "help";
 	const v = val.toLowerCase();
-	if (v.includes("both")) return "compare_arrows";
+	if (v.includes("both")) return "key";
 	if (v.includes("voluntary")) return "volunteer_activism";
 	return "help";
 };
@@ -41,9 +41,9 @@ export const iconNameForAdmission = (val?: string): string => {
 export const iconNameForLocked = (val?: string): string => {
 	if (!val) return "help";
 	const v = val.toLowerCase();
+	if (v.includes("unlocked")) return "lock_open";
 	if (v.includes("both")) return "lock";
 	if (v.includes("locked")) return "lock";
-	if (v.includes("unlocked")) return "lock_open";
 	return "help";
 };
 

@@ -9,23 +9,46 @@ type Props = {
 	className?: string;
 };
 
+const Tooltips: Record<string, string> = {
+	"person": "Self",
+	"groups": "Community",
+	"diversity_3": "Street Teams",
+	"local_police": "Police",
+	"emergency": "EMS",
+	"local_hospital": "Hospital/ED",
+	"badge": "BHAC",
+};
+
 const Icon: React.FC<Props> = ({ name, title, tone, muted, stack, className }) => {
+	const [cleanName, modifier = ""] = name.split(" ");
+
+	if (stack?.length) {
+		return (
+			<>
+				{stack.map((s: string, i) => {
+					const [cleanName = "", modifier = ""] = s.split(" ");
+
+					return (
+						<span
+							title={Tooltips[cleanName] || title || cleanName}
+							className={`icon ${tone ? tone : ""} ${modifier} ${className || ""} ${muted || cleanName == "help" ? "muted" : ""} ${modifier}`.trim()}
+						>
+							<span key={i} className={`material-symbols-outlined`}>
+								{cleanName}
+							</span>
+						</span>
+					);
+				})}
+			</>
+		);
+	}
+
 	return (
 		<span
-			title={title || name}
-			className={`icon ${tone ? tone : ""} ${className || ""}`.trim()}
-			style={muted ? { opacity: 0.35 } : undefined}
+			title={title || cleanName}
+			className={`icon ${tone ? tone : ""} ${modifier} ${className || ""} ${muted || cleanName == "help" ? "muted" : ""} ${modifier}`.trim()}
 		>
-			<span className="material-symbols-outlined">{name}</span>
-			{stack && stack.length > 0 ? (
-				<span className="icon-stack">
-					{stack.map((s, i) => (
-						<span key={i} className="material-symbols-outlined" title={s}>
-							{s}
-						</span>
-					))}
-				</span>
-			) : null}
+			<span className="material-symbols-outlined">{cleanName}</span>
 		</span>
 	);
 };

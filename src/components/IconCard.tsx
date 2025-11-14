@@ -16,7 +16,7 @@ import {
 	simplifyMedical,
 	subtitle as subtitleFor,
 	yn,
-	hasTransportSupport,
+	hasTransportSupport, isYes,
 } from "../utils/mapping";
 
 const CategoryBar: React.FC<{ cat?: string }> = ({ cat }) => {
@@ -51,12 +51,14 @@ const IconCard: React.FC<{ row: SiteRow }> = ({ row }) => {
 				<div className="icon-lane">
 					<Icon name={iconNameForAdmission(row.admissionType)} title={`Admission: ${row.admissionType || "-"}`} />
 					<Icon name={iconNameForLocked(row.lockedStatus)} title={`Security: ${row.lockedStatus || "-"}`} />
-					<Icon name="meeting_room" title="Drop-in" muted={!yn(row.dropIn)} />
-					<Icon name="person_pin_circle" title="Drop-off" muted={!yn(row.dropOff)} />
+					<Icon name="keyboard_tab" title="Drop-in" className={isNo(row.dropIn) ? "none" : ""} />
+					<Icon name="place_item" title="Drop-off" className={isNo(row.dropOff) ? "none" : ""} />
 					<Icon name="group_add" title="Accepted from" stack={parseAccepted(row.acceptedFrom)} />
+				</div>
+				<div className="icon-lane">
+					<Icon name={iconNameForLOS(row.lengthOfStay)} title={row.lengthOfStay || "LOS"} />
 					<Icon name="tune" title={`Intake: ${simplifyComplexity(row.intakeComplexity)}`} tone={toneForComplexity(row.intakeComplexity)} />
 					<Icon name={iconNameForMedical(row.medicalClearance)} title={row.medicalClearance || "Medical clearance"} />
-					<Icon name={iconNameForLOS(row.lengthOfStay)} title={row.lengthOfStay || "LOS"} />
 					<Icon name="alt_route" title="Transport In" stack={iconNamesForTransport(row.transportIn)} />
 					<Icon name="alt_route" title="Transport Out" stack={iconNamesForTransport(row.transportOut)} />
 					<Icon name="volunteer_activism" title="Transport support" muted={!hasTransportSupport(row.transportSupport)} />
@@ -64,12 +66,12 @@ const IconCard: React.FC<{ row: SiteRow }> = ({ row }) => {
 				</div>
 
 				<div className="kv">
-					<strong>LOS:</strong>
-					<span>{row.lengthOfStay || "-"}</span>
-					<strong>Intake:</strong>
-					<span>{row.hoursIntake || row.hoursOperation || "-"}</span>
-					<strong>Beds:</strong>
-					<span>{row.bedsDph || "-"}</span>
+					<span>LOS:</span>
+					<span className="strong">{row.lengthOfStay || "-"}</span>
+					<span>Intake:</span>
+					<span className="strong">{row.hoursIntake || row.hoursOperation || "-"}</span>
+					<span>Beds:</span>
+					<span className="strong">{row.bedsDph || "-"}</span>
 					{(row.capacityConstraints || "").toLowerCase() === "yes" && <Icon name="warning" title="Capacity constraints" tone="warn" />}
 				</div>
 			</div>
@@ -104,9 +106,33 @@ const IconCard: React.FC<{ row: SiteRow }> = ({ row }) => {
 
 export default IconCard;
 
+const acceptedFromSources = [
+//	"self",
+//	"community",
+	"streetteams",
+	"police",
+	"ems",
+	"hospital/ed",
+//	"bhacauthorized",
+];
+
 function parseAccepted(val?: string): string[] {
-	return (parsePipes(val) as string[]).map((s) => iconNameForSource(s));
+	const sources = (parsePipes(val) as string[]).map((s) => s.toLowerCase());
+	const iconsNames = [];
+
+	for (const source of acceptedFromSources) {
+		let name = iconNameForSource(source);
+
+		if (!sources.includes(source)) {
+			name += " none";
+		}
+
+		iconsNames.push(name);
+	}
+
+	return iconsNames;
 }
+
 function toneForComplexity(v?: string): "ok" | "warn" | "err" | undefined {
 	const lvl = complexityLevel(v);
 	if (lvl === 1) return "ok";

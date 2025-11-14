@@ -1,24 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { SiteRow } from "./types";
 import { parseCsvFile, parseCsvText } from "./utils/csv";
-import {
-	categoryClass,
-	complexityLevel,
-	displayTitle,
-	extractPhone,
-	iconNameForAdmission,
-	iconNameForLocked,
-	iconNameForSource,
-	iconNamesForTransport,
-	isNo,
-	listTransportNames,
-	parsePipes,
-	simplifyComplexity,
-	simplifyMedical,
-	subtitle as subtitleFor,
-	yn,
-	hasTransportSupport,
-} from "./utils/mapping";
 import IconCard from "./components/IconCard";
 import ChipCard from "./components/ChipCard";
 
@@ -27,6 +9,13 @@ const App: React.FC = () => {
 	const [view, setView] = useState<"icon" | "chip">("icon");
 	const [q, setQ] = useState<string>("");
 	const fileRef = useRef<HTMLInputElement>(null);
+	const [theme, setTheme] = useState<"light" | "dark">(() => {
+		if (typeof window === "undefined") return "dark";
+		const stored = window.localStorage.getItem("theme");
+		if (stored === "light" || stored === "dark") return stored;
+		if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
+		return "light";
+	});
 
 	const onLoadDefault = async () => {
 		try {
@@ -50,6 +39,15 @@ const App: React.FC = () => {
 	};
 
 	useEffect(() => {
+		document.body.dataset.theme = theme;
+		if (typeof window !== "undefined") {
+			window.localStorage.setItem("theme", theme);
+		}
+	}, [theme]);
+
+	const toggleTheme = () => setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+
+	useEffect(() => {
 		onLoadDefault();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
@@ -60,41 +58,44 @@ const App: React.FC = () => {
 		<div>
 			<header className="app-header">
 				<h1 className="font-semibold">
-					Site Cards (React) <small className="text-[#8aa3bf] font-semibold">v react-boot</small>
+					Site Cards<small className="text-[var(--accent)] font-semibold"></small>
 				</h1>
 				<div className="flex items-center gap-3">
 					<div className="inline-flex rounded-lg overflow-hidden border border-[var(--card-border)]" role="group" aria-label="View type">
 						<button
-							className={`px-3 py-2 bg-[#141a22] ${view === "icon" ? "bg-[#1c2633]" : ""}`}
+							className={`segmented-btn ${view === "icon" ? "is-active" : ""}`}
 							onClick={() => setView("icon")}
 						>
 							Icon view
 						</button>
 						<button
-							className={`px-3 py-2 bg-[#141a22] ${view === "chip" ? "bg-[#1c2633]" : ""}`}
+							className={`segmented-btn ${view === "chip" ? "is-active" : ""}`}
 							onClick={() => setView("chip")}
 						>
 							Chip view
 						</button>
 					</div>
 					<div className="flex items-center gap-2">
-						<button className="btn px-3 py-2 bg-[#141a22] rounded-lg border border-[var(--card-border)]" onClick={onLoadDefault}>Load CSV in public</button>
-						<button className="btn px-3 py-2 bg-[#141a22] rounded-lg border border-[var(--card-border)]" onClick={onPickFile}>Choose CSV…</button>
+						<button className="btn" type="button" onClick={onLoadDefault}>Load CSV in public</button>
+						<button className="btn" type="button" onClick={onPickFile}>Choose CSV…</button>
 						<input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={onFileChange} />
 					</div>
 					<div className="search">
 						<input
-							className="bg-[#0f151d] border border-[var(--card-border)] text-[#e6e8eb] px-2.5 py-2 rounded-lg w-[320px]"
+							className="search-input"
 							type="search"
 							placeholder="Search nickname, category, eligibility…"
 							value={q}
 							onChange={(e) => setQ(e.target.value)}
 						/>
 					</div>
+					<button className="btn" type="button" onClick={toggleTheme} aria-pressed={theme === "dark"}>
+						{theme === "dark" ? "Light mode" : "Dark mode"}
+					</button>
 				</div>
 			</header>
 
-			<aside className="legend px-5 text-[var(--muted)]">
+			<aside className="legend hidden lg:block px-5 text-[var(--muted)] absolute top-22">
 				<details>
 					<summary>Legend</summary>
 					<ul className="list-disc ml-5">
@@ -103,7 +104,9 @@ const App: React.FC = () => {
 						<li><span className="inline-block w-3 h-3 rounded bg-[var(--sudwm)] mr-2 align-middle" /> SUD Withdrawal Mgmt</li>
 						<li><span className="inline-block w-3 h-3 rounded bg-[var(--sudsub)] mr-2 align-middle" /> SUD Subacute</li>
 					</ul>
+{/*
 					<p className="text-[var(--muted)]">Fixed order lane: admission → lock → drop-in → drop-off → accepted-from → complexity → medical → LOS → transport → ADA.</p>
+*/}
 				</details>
 			</aside>
 
